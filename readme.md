@@ -23,3 +23,9 @@ Proudly built in Fuquay-Varina, NC
 Targeting $200k+ Data Engineering roles
 
 Work in progress – daily commits & updates.
+
+## Day 5 Progress (Kafka Consumer Loop)
+- Added `simple_consumer.py`: Connects to local Kafka, reads from `test-topic-day4` from earliest offset  
+- Verified full round-trip: producer → Kafka → consumer prints the same JSON message  
+- Confirmed bidirectional flow works end-to-end  
+- Committed & pushed consumer script
