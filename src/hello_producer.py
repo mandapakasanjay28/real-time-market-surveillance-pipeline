@@ -1,52 +1,48 @@
 # hello_producer.py
-# Day 7 – Add basic anomaly detection: flag price jumps >5% from last sent
+# Day 9 – Use real AAPL price from yfinance instead of random
 
 from kafka import KafkaProducer
 import json
 import time
-import random
+import yfinance as yf
 
 # Local Kafka settings
 BOOTSTRAP_SERVERS = 'localhost:9092'
 TOPIC_NAME = 'market-quotes'
 
-print("Day 7: Starting fake market producer with anomaly detection...")
-print(f"Sending simulated updates to topic: {TOPIC_NAME}")
+print("Day 9: Starting producer with real AAPL data from yfinance...")
+print(f"Sending updates to topic: {TOPIC_NAME}")
 
 producer = KafkaProducer(
     bootstrap_servers=BOOTSTRAP_SERVERS,
     value_serializer=lambda v: json.dumps(v).encode('utf-8')
 )
 
-tickers = ['AAPL', 'TSLA', 'GOOGL']
-last_prices = {ticker: 150.0 for ticker in tickers}  # Track last price per ticker
+ticker_symbol = "AAPL"
 
 try:
     while True:
-        for ticker in tickers:
-            # Simulate price change
-            base_price = last_prices[ticker] + random.uniform(-3, 3)
-            price = round(base_price + random.uniform(-2, 2), 2)
+        # Fetch real current price from yfinance
+        stock = yf.Ticker(ticker_symbol)
+        price = stock.info.get('regularMarketPrice', 0.0)  # fallback to 0 if error
 
-            event = {
-                "ticker": ticker,
-                "price": price,
-                "timestamp": int(time.time() * 1000),
-                "volume": random.randint(50, 500)
-            }
+        if price == 0:
+            print("Warning: Could not fetch real price – skipping")
+            time.sleep(3)
+            continue
 
-            # Simple anomaly rule: >5% change from last sent price
-            change_pct = abs((price - last_prices[ticker]) / last_prices[ticker]) * 100
-            if change_pct > 5:
-                print(f"ANOMALY DETECTED! {ticker} price jump: {change_pct:.1f}% ({last_prices[ticker]:.2f} → {price:.2f})")
+        event = {
+            "ticker": ticker_symbol,
+            "price": price,
+            "timestamp": int(time.time() * 1000),
+            "volume": stock.info.get('regularMarketVolume', 0)
+        }
 
-            last_prices[ticker] = price  # Update last price
+        print(f"Sending real AAPL data: {event}")
+        producer.send(TOPIC_NAME, value=event)
+        producer.flush()
 
-            print(f"Sending: {event}")
-            producer.send(TOPIC_NAME, value=event)
-            producer.flush()
-
-        time.sleep(3)  # Send every 3 seconds
+        time.sleep(3)  # Update every 3 seconds (respect yfinance rate limits)
 
 except KeyboardInterrupt:
     print("\nStopped by user (Ctrl+C)")
