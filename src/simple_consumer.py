@@ -35,7 +35,7 @@ for message in consumer:
     # Anomaly rule: >5% change from last seen price for this ticker
     if ticker in last_prices:
         change_pct = abs((price - last_prices[ticker]) / last_prices[ticker]) * 100
-        if change_pct > 0.1:
+        if change_pct > 5:
             anomaly_count += 1
             print(f"ANOMALY DETECTED! {ticker} price jump: {change_pct:.1f}% ({last_prices[ticker]:.2f} → {price:.2f})")
             print(f"Total anomalies detected so far: {anomaly_count}")
@@ -46,7 +46,7 @@ for message in consumer:
 
     print("-" * 50)
 
-    # Stop after 30 messages for this test (remove for continuous)
+    # Stop after 30 messages for this test (remove for continuous listening)
     if len(last_prices) > 30:
         break
 
@@ -54,3 +54,4 @@ consumer.close()
 print(f"Consumer closed – test complete.")
 print(f"Final anomaly count: {anomaly_count}")
 print("Run me with: python src/simple_consumer.py")
+
