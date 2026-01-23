@@ -29,3 +29,10 @@ Work in progress – daily commits & updates.
 - Verified full round-trip: producer → Kafka → consumer prints the same JSON message  
 - Confirmed bidirectional flow works end-to-end  
 - Committed & pushed consumer script
+
+
+## Day 10 Progress (Multi-Ticker Real Data Streaming)
+- Updated `hello_producer.py`: Fetch real prices for AAPL, TSLA, GOOGL from yfinance  
+- Producer sends diversified live market events every 5 seconds to `market-quotes` topic  
+- Ran producer → saw actual current prices printing and streaming  
+- Committed & pushed multi-ticker real-data version
