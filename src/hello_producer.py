@@ -1,16 +1,16 @@
 # hello_producer.py
-# Day 9 – Real AAPL price streaming from yfinance to Kafka
+# Day 10 – Multi-ticker real market data from yfinance (AAPL, TSLA, GOOGL)
 
 from kafka import KafkaProducer
 import json
 import time
 import yfinance as yf
 
-# Local Kafka settings (from docker-compose.yml)
+# Local Kafka settings
 BOOTSTRAP_SERVERS = 'localhost:9092'
 TOPIC_NAME = 'market-quotes'
 
-print("Day 9: Starting producer with REAL AAPL prices from yfinance...")
+print("Day 10: Starting multi-ticker producer with real data from yfinance...")
 print(f"Sending updates to topic: {TOPIC_NAME}")
 
 producer = KafkaProducer(
@@ -18,32 +18,31 @@ producer = KafkaProducer(
     value_serializer=lambda v: json.dumps(v).encode('utf-8')
 )
 
-ticker_symbol = "AAPL"
+tickers = ['AAPL', 'TSLA', 'GOOGL']
 
 try:
     while True:
-        # Fetch real current price from yfinance
-        stock = yf.Ticker(ticker_symbol)
-        price = stock.info.get('regularMarketPrice', 0.0)  # fallback to 0 if error
+        for ticker_symbol in tickers:
+            # Fetch real current price from yfinance
+            stock = yf.Ticker(ticker_symbol)
+            price = stock.info.get('regularMarketPrice', 0.0)
 
-        if price == 0:
-            print("Warning: Could not fetch real price from yfinance – skipping this cycle")
-            time.sleep(3)
-            continue
+            if price == 0:
+                print(f"Warning: Could not fetch price for {ticker_symbol} – skipping")
+                continue
 
-        # Build event with real data
-        event = {
-            "ticker": ticker_symbol,
-            "price": price,
-            "timestamp": int(time.time() * 1000),
-            "volume": stock.info.get('regularMarketVolume', 0)
-        }
+            event = {
+                "ticker": ticker_symbol,
+                "price": price,
+                "timestamp": int(time.time() * 1000),
+                "volume": stock.info.get('regularMarketVolume', 0)
+            }
 
-        print(f"Sending real AAPL data: {event}")
-        producer.send(TOPIC_NAME, value=event)
-        producer.flush()  # Ensure sent before next cycle
+            print(f"Sending real data for {ticker_symbol}: {event}")
+            producer.send(TOPIC_NAME, value=event)
+            producer.flush()
 
-        time.sleep(3)  # Update every 3 seconds (yfinance is not ultra-high-frequency)
+        time.sleep(5)  # Slightly longer delay for multiple tickers (rate limit friendly)
 
 except KeyboardInterrupt:
     print("\nStopped by user (Ctrl+C)")
