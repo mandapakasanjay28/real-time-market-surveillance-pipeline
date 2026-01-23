@@ -1,14 +1,13 @@
 # simple_consumer.py
-# Day 8 – Move anomaly detection to consumer: flag >5% price jumps on received events
+# Day 11 – Multi-ticker anomaly detection in consumer (flag >5% jumps across tickers)
 
 from kafka import KafkaConsumer
 import json
-import time
 
 BOOTSTRAP_SERVERS = 'localhost:9092'
 TOPIC_NAME = 'market-quotes'
 
-print("Day 8: Starting consumer with anomaly detection...")
+print("Day 11: Starting multi-ticker consumer with anomaly detection...")
 print(f"Connecting to Kafka at {BOOTSTRAP_SERVERS}")
 print(f"Listening to topic: {TOPIC_NAME}")
 
@@ -17,7 +16,7 @@ consumer = KafkaConsumer(
     bootstrap_servers=BOOTSTRAP_SERVERS,
     auto_offset_reset='earliest',
     enable_auto_commit=True,
-    group_id='day8-surveillance-group',
+    group_id='day11-surveillance-group',
     value_deserializer=lambda x: json.loads(x.decode('utf-8'))
 )
 
@@ -44,8 +43,8 @@ for message in consumer:
 
     print("-" * 50)
 
-    # Stop after 10 messages for this test (remove to keep listening forever)
-    if len(last_prices) > 10:
+    # Stop after 20 messages for this test (remove for continuous listening)
+    if len(last_prices) > 20:
         break
 
 consumer.close()
