@@ -43,3 +43,10 @@ Work in progress – daily commits & updates.
 - Added anomaly rule: Flag >5% price jumps on incoming real events  
 - Ran producer + consumer side-by-side → saw live multi-ticker prices + anomalies flagged in real time  
 - Committed & pushed enhanced consumer script
+
+## Day 12 Progress (Anomaly Logging & Count in Consumer)
+- Enhanced `simple_consumer.py`: Added anomaly count tracking & running logging  
+- Prints "Total anomalies detected so far: X" after each flag  
+- Final summary "Final anomaly count: X" at close  
+- Ran consumer with real multi-ticker data → saw live logging & count in action  
+- Committed & pushed updated consumer script
