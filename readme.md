@@ -49,4 +49,14 @@ Work in progress – daily commits & updates.
 - Prints "Total anomalies detected so far: X" after each flag  
 - Final summary "Final anomaly count: X" at close  
 - Ran consumer with real multi-ticker data → saw live logging & count in action  
+- Committed & pushed updated consumer script 
+
+
+## Day 13 Progress (Velocity-Based Anomaly Detection in Consumer)
+- Updated `simple_consumer.py`: Added velocity anomaly rule (change over last 3 messages per ticker)  
+- Uses `deque` for fixed-size price history per ticker  
+- Flags anomalies when total change >5% over the window  
+- Ran consumer with real multi-ticker data → saw live velocity anomaly flags  
 - Committed & pushed updated consumer script
+
+
