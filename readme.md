@@ -36,3 +36,10 @@ Work in progress – daily commits & updates.
 - Producer sends diversified live market events every 5 seconds to `market-quotes` topic  
 - Ran producer → saw actual current prices printing and streaming  
 - Committed & pushed multi-ticker real-data version
+
+
+## Day 11 Progress (Multi-Ticker Consumer Anomaly Detection)
+- Updated `simple_consumer.py`: Track last price per ticker (AAPL, TSLA, GOOGL, etc.)  
+- Added anomaly rule: Flag >5% price jumps on incoming real events  
+- Ran producer + consumer side-by-side → saw live multi-ticker prices + anomalies flagged in real time  
+- Committed & pushed enhanced consumer script
